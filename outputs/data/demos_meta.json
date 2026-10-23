@@ -1,0 +1,59 @@
+{
+  "episodes": 120,
+  "samples": 38880,
+  "record_rate_hz": 50.0,
+  "label_mode": "phase",
+  "n_phase": 8,
+  "phase_names": [
+    "approach",
+    "descend",
+    "grasp",
+    "lift",
+    "move",
+    "lower",
+    "release",
+    "retract"
+  ],
+  "label_source": "ST.PhaseSequencer（状态驱动：到达路点 + 驻留）",
+  "obs_names": [
+    "q1",
+    "q2",
+    "q3",
+    "q4",
+    "dq1",
+    "dq2",
+    "dq3",
+    "dq4",
+    "tcp_x",
+    "tcp_y",
+    "tcp_z",
+    "tcp_yaw",
+    "rel_obj_x",
+    "rel_obj_y",
+    "rel_obj_z",
+    "obj_yaw",
+    "grip",
+    "rel_place_x",
+    "rel_place_y",
+    "phase_progress"
+  ],
+  "act_names": [
+    "phase_approach",
+    "phase_descend",
+    "phase_grasp",
+    "phase_lift",
+    "phase_move",
+    "phase_lower",
+    "phase_release",
+    "phase_retract"
+  ],
+  "act_note": "动作 = 当前相位的 one-hot（任务级分类；运动由 phase_segment 原语执行）",
+  "domain_randomization": [
+    "object xy",
+    "place xy",
+    "object mass 30~80 g",
+    "joint friction ×0.7~1.4",
+    "initial joint jitter ±6°"
+  ],
+  "seed": 0
+}

@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!-- SCARA 语义描述：arm = base_link→link4 串链；gripper = 两指 -->
+<robot name="scara">
+  <virtual_joint name="world_joint" type="fixed" parent_frame="world" child_link="base_link"/>
+  <group name="arm">
+    <chain base_link="base_link" tip_link="link4"/>
+  </group>
+  <group name="gripper">
+    <joint name="gripper_left_joint"/>
+    <joint name="gripper_right_joint"/>
+  </group>
+  <group_state name="home" group="arm">
+    <joint name="joint1" value="0"/>
+    <joint name="joint2" value="-0.5"/>
+    <joint name="joint3" value="0.04"/>
+    <joint name="joint4" value="0"/>
+  </group_state>
+  <group_state name="above_object" group="arm">
+    <joint name="joint1" value="0.665"/>
+    <joint name="joint2" value="-1.657"/>
+    <joint name="joint3" value="0.040"/>
+    <joint name="joint4" value="0.992"/>
+  </group_state>
+  <disable_collisions link1="base_link" link2="link2" reason="Never"/>
+  <disable_collisions link1="base_link" link2="link3" reason="Never"/>
+  <disable_collisions link1="link1" link2="link3" reason="Never"/>
+  <disable_collisions link1="link1" link2="link4" reason="Never"/>
+  <disable_collisions link1="base_link" link2="link4" reason="Never"/>
+  <disable_collisions link1="base_link" link2="gripper_left" reason="Never"/>
+  <disable_collisions link1="base_link" link2="gripper_right" reason="Never"/>
+  <disable_collisions link1="link1" link2="gripper_left" reason="Never"/>
+  <disable_collisions link1="link1" link2="gripper_right" reason="Never"/>
+  <disable_collisions link1="link2" link2="link4" reason="Never"/>
+  <disable_collisions link1="link2" link2="gripper_left" reason="Never"/>
+  <disable_collisions link1="link2" link2="gripper_right" reason="Never"/>
+  <disable_collisions link1="link3" link2="gripper_left" reason="Never"/>
+  <disable_collisions link1="link3" link2="gripper_right" reason="Never"/>
+  <disable_collisions link1="link4" link2="gripper_left" reason="Never"/>
+  <disable_collisions link1="link4" link2="gripper_right" reason="Never"/>
+  <disable_collisions link1="link1" link2="cam_eye_link" reason="Never"/>
+  <disable_collisions link1="link2" link2="cam_eye_link" reason="Never"/>
+  <disable_collisions link1="link3" link2="cam_eye_link" reason="Never"/>
+  <disable_collisions link1="link1" link2="cam_wrist_link" reason="Never"/>
+  <disable_collisions link1="link2" link2="cam_wrist_link" reason="Never"/>
+  <disable_collisions link1="link3" link2="cam_wrist_link" reason="Never"/>
+  <disable_collisions link1="gripper_left" link2="cam_eye_link" reason="Never"/>
+  <disable_collisions link1="gripper_right" link2="cam_eye_link" reason="Never"/>
+  <disable_collisions link1="gripper_left" link2="cam_wrist_link" reason="Never"/>
+  <disable_collisions link1="gripper_right" link2="cam_wrist_link" reason="Never"/>
+</robot>

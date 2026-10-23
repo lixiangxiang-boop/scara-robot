@@ -1,0 +1,16 @@
+{
+  "rounds": [
+    {
+      "round": 1,
+      "sample_success": "16/16",
+      "new_samples_kept": 3706,
+      "eval_success": "12/12",
+      "eval_success_rate": 1.0,
+      "eval_mean_place_err_mm": 3.3892796585238187,
+      "val_phase_accuracy": 0.9860399961471558,
+      "samples": 42586
+    }
+  ],
+  "base_samples": 38880,
+  "total_time_s": 94.5
+}

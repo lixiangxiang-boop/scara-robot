@@ -1,0 +1,3 @@
+﻿@echo off
+chcp 65001 >nul
+call "%~dp0..\menu.bat" --run open_ros2_manual

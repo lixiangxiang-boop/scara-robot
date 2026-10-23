@@ -1,0 +1,161 @@
+<?xml version="1.0" ?>
+<!-- 由 ros2_ws/tools/gen_ros_assets.py 从 MuJoCo 场景生成，请勿手改。
+     台面中心 (0.4, 0)，0.52 x 0.52 m，台面高 0.1 m；
+     物块 0.03 mm；相机位置/视场角与 scara_scene.py 完全一致。 -->
+<sdf version="1.6">
+  <world name="scara_world">
+    <scene>
+      <ambient>0.30 0.32 0.36 1</ambient>
+      <background>0.78 0.85 0.95 1</background>
+      <shadows>true</shadows>
+    </scene>
+
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 3 0 0 0</pose>
+      <diffuse>0.55 0.55 0.52 1</diffuse>
+      <specular>0.05 0.05 0.05 1</specular>
+      <direction>-0.4 0.3 -1</direction>
+    </light>
+
+    <physics type="ode">
+      <max_step_size>0.001</max_step_size>
+      <real_time_update_rate>1000</real_time_update_rate>
+      <real_time_factor>1.0</real_time_factor>
+      <ode>
+        <solver><type>quick</type><iters>50</iters><sor>1.2</sor></solver>
+        <constraints>
+          <cfm>0.0</cfm><erp>0.2</erp>
+          <contact_max_correcting_vel>0.1</contact_max_correcting_vel>
+          <contact_surface_layer>0.0005</contact_surface_layer>
+        </constraints>
+      </ode>
+    </physics>
+    <gravity>0 0 -9.81</gravity>
+
+    <include><uri>model://ground_plane</uri></include>
+
+    <!-- 工作台（与 MuJoCo 同参数） -->
+    <model name="table">
+      <static>true</static>
+      <link name="top">
+        <pose>0.4 0 0.09 0 0 0</pose>
+        <collision name="top_c">
+          <geometry><box><size>0.52 0.52 0.02</size></box></geometry>
+          <surface><friction><ode><mu>0.9</mu><mu2>0.9</mu2></ode></friction></surface>
+        </collision>
+        <visual name="top_v">
+          <geometry><box><size>0.52 0.52 0.02</size></box></geometry>
+          <material><ambient>0.78 0.66 0.48 1</ambient><diffuse>0.86 0.74 0.56 1</diffuse></material>
+        </visual>
+      </link>
+      <link name="leg0">
+        <pose>0.63 0.23 0.04 0 0 0</pose>
+        <collision name="leg0_c"><geometry><box><size>0.036 0.036 0.08</size></box></geometry></collision>
+        <visual name="leg0_v"><geometry><box><size>0.036 0.036 0.08</size></box></geometry>
+          <material><ambient>0.55 0.42 0.30 1</ambient><diffuse>0.62 0.48 0.34 1</diffuse></material></visual>
+      </link>
+      <link name="leg1">
+        <pose>0.63 -0.23 0.04 0 0 0</pose>
+        <collision name="leg1_c"><geometry><box><size>0.036 0.036 0.08</size></box></geometry></collision>
+        <visual name="leg1_v"><geometry><box><size>0.036 0.036 0.08</size></box></geometry>
+          <material><ambient>0.55 0.42 0.30 1</ambient><diffuse>0.62 0.48 0.34 1</diffuse></material></visual>
+      </link>
+      <link name="leg2">
+        <pose>0.17 0.23 0.04 0 0 0</pose>
+        <collision name="leg2_c"><geometry><box><size>0.036 0.036 0.08</size></box></geometry></collision>
+        <visual name="leg2_v"><geometry><box><size>0.036 0.036 0.08</size></box></geometry>
+          <material><ambient>0.55 0.42 0.30 1</ambient><diffuse>0.62 0.48 0.34 1</diffuse></material></visual>
+      </link>
+      <link name="leg3">
+        <pose>0.17 -0.23 0.04 0 0 0</pose>
+        <collision name="leg3_c"><geometry><box><size>0.036 0.036 0.08</size></box></geometry></collision>
+        <visual name="leg3_v"><geometry><box><size>0.036 0.036 0.08</size></box></geometry>
+          <material><ambient>0.55 0.42 0.30 1</ambient><diffuse>0.62 0.48 0.34 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- 放置区（与 MuJoCo place_zone 同尺寸） -->
+    <model name="place_area">
+      <static>true</static>
+      <link name="link">
+        <pose>0.3 0.12 0.1016 0 0 0</pose>
+        <visual name="v">
+          <geometry><box><size>0.05 0.05 0.001</size></box></geometry>
+          <material><ambient>0.15 0.75 0.25 1</ambient><diffuse>0.20 0.85 0.30 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 物块（30 mm / 50 g） -->
+    <model name="target_box">
+      <pose>0.30 -0.05 0.115 0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>0.05</mass>
+          <inertia><ixx>7.5e-6</ixx><iyy>7.5e-6</iyy><izz>7.5e-6</izz>
+            <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia>
+        </inertial>
+        <collision name="c">
+          <geometry><box><size>0.03 0.03 0.03</size></box></geometry>
+          <surface><friction><ode><mu>1.2</mu><mu2>1.2</mu2></ode></friction>
+            <bounce><restitution_coefficient>0.0</restitution_coefficient></bounce></surface>
+        </collision>
+        <visual name="v">
+          <geometry><box><size>0.03 0.03 0.03</size></box></geometry>
+          <material><ambient>0.95 0.80 0.10 1</ambient><diffuse>1.00 0.86 0.15 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- 世界相机（cam_top / cam_front，位姿与 MuJoCo 一致） -->
+    <model name="world_cameras">
+      <static>true</static>
+      <link name="cam_top_link">
+        <pose>0.4 0 1.25 0 1.570796 1.570796</pose>
+        <sensor name="cam_top" type="camera">
+          <pose>0 0 0 0 0 0</pose>
+          <camera>
+            <horizontal_fov>0.860797</horizontal_fov>
+            <image><width>640</width><height>480</height></image>
+            <clip><near>0.02</near><far>8.0</far></clip>
+          </camera>
+          <always_on>1</always_on>
+          <update_rate>10</update_rate>
+          <visualize>false</visualize>
+          <plugin filename="libgazebo_ros_camera.so" name="cam_top_driver">
+            <ros>
+              <image_topic_name>image_raw</image_topic_name>
+              <camera_info_topic_name>camera_info</camera_info_topic_name>
+            </ros>
+            <frame_name>cam_top</frame_name>
+          </plugin>
+        </sensor>
+      </link>
+      <link name="cam_front_link">
+        <pose>0.26 -0.95 0.55 0 0.442184 1.570796</pose>
+        <sensor name="cam_front" type="camera">
+          <pose>0 0 0 0 0 0</pose>
+          <camera>
+            <horizontal_fov>0.946116</horizontal_fov>
+            <image><width>320</width><height>240</height></image>
+            <clip><near>0.02</near><far>8.0</far></clip>
+          </camera>
+          <always_on>1</always_on>
+          <update_rate>10</update_rate>
+          <visualize>false</visualize>
+          <plugin filename="libgazebo_ros_camera.so" name="cam_front_driver">
+            <ros>
+              <image_topic_name>image_raw</image_topic_name>
+              <camera_info_topic_name>camera_info</camera_info_topic_name>
+            </ros>
+            <frame_name>cam_front</frame_name>
+          </plugin>
+        </sensor>
+      </link>
+    </model>
+
+    <!-- 实体状态服务：/get_entity_state（用于验收物块最终位姿） -->
+    <plugin filename="libgazebo_ros_state.so" name="gazebo_ros_state"/>
+  </world>
+</sdf>

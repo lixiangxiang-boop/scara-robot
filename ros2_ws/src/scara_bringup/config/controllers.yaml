@@ -1,0 +1,37 @@
+# ros2_control 控制器配置（供 gazebo_ros2_control 读取）
+#
+# 为什么 update_rate 取 1000 Hz：与项目 P4/P5 阶段的控制周期一致（1 ms），
+# 这样 Gazebo 里的关节跟踪误差量级可以直接与 MuJoCo/Simulink 对照。
+# 若宿主机较慢，可降到 500 Hz（精度约差一倍，见 ROS2 手册 7.4 节）。
+controller_manager:
+  ros__parameters:
+    update_rate: 1000
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    scara_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+scara_controller:
+  ros__parameters:
+    joints:
+      - joint1
+      - joint2
+      - joint3
+      - joint4
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+    allow_partial_joints_goal: false
+    open_loop_control: false
+    constraints:
+      stopped_velocity_tolerance: 0.05
+      goal_time: 0.8
+      joint1: {trajectory: 0.50, goal: 0.08}
+      joint2: {trajectory: 0.50, goal: 0.08}
+      joint3: {trajectory: 0.03, goal: 0.008}
+      joint4: {trajectory: 0.80, goal: 0.15}
+

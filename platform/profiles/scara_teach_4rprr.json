@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "profile_id": "scara_teach_4rprr",
+  "display_name": "SCARA teach 4RPRR",
+  "dof": 4,
+  "joint_names": ["joint1", "joint2", "joint3", "joint4"],
+  "joint_types": ["revolute", "revolute", "prismatic", "revolute"],
+  "state_dim": 19,
+  "action_dim": 4,
+  "end_effector": "two-finger parallel gripper",
+  "controller": "closed-form IK + quintic trajectory + CTC",
+  "notes": "a1=a2=0.225 m, J3 stroke 0.200 m, MuJoCo + ROS2/Gazebo branches",
+  "entrypoints": {
+    "model_spec": "python/armlab/spec.py",
+    "scene": "python/armlab/scara_scene.py",
+    "task": "python/armlab/scara_task.py"
+  },
+  "actions": [
+    {
+      "id": "full_console",
+      "label": "最新全栈控制台（Gazebo / Octo / Qwen）",
+      "description": "调用当前正式项目 C:\\SCARA，不修改桌面项目文件",
+      "mode": "new_console",
+      "command": ["C:\\Windows\\System32\\cmd.exe", "/k", "call C:\\SCARA\\start_scara_console.cmd"]
+    },
+    {
+      "id": "mujoco_auto",
+      "label": "MuJoCo 自动抓取演示",
+      "description": "打开 MuJoCo 窗口并循环执行抓取-放置",
+      "mode": "new_console",
+      "command": ["{python}", "{root}\\python\\scripts\\demo_scara_viewer.py"]
+    },
+    {
+      "id": "mujoco_console",
+      "label": "MuJoCo 交互控制器",
+      "description": "pick / place / move / home / auto 等命令",
+      "mode": "new_console",
+      "command": ["{python}", "{root}\\python\\scripts\\scara_console.py"]
+    },
+    {
+      "id": "batch_eval",
+      "label": "随机工况批量评测",
+      "description": "执行 5 组随机抓放并输出统计",
+      "mode": "new_console",
+      "command": ["{python}", "{root}\\python\\scripts\\run_scara_pick_place.py", "--rand", "5"]
+    },
+    {
+      "id": "dual_camera",
+      "label": "双相机协同演示",
+      "description": "全局顶视 + 第一人称局部视野",
+      "mode": "new_console",
+      "command": ["{python}", "{root}\\python\\scripts\\demo_dual_camera.py"]
+    },
+    {
+      "id": "bc_demo",
+      "label": "BC / DAgger 策略演示",
+      "description": "MuJoCo 中运行已训练策略",
+      "mode": "new_console",
+      "command": ["{python}", "{root}\\learning\\demo_policy_viewer.py"]
+    },
+    {
+      "id": "render_scene",
+      "label": "渲染场景截图",
+      "description": "输出到 outputs\\figures",
+      "mode": "new_console",
+      "command": ["{python}", "{root}\\python\\scripts\\render_scene.py", "--pose"]
+    },
+    {
+      "id": "train_bc",
+      "label": "训练行为克隆 BC",
+      "description": "250 epochs，CPU",
+      "mode": "new_console",
+      "command": ["{python}", "{root}\\learning\\train_bc.py", "--epochs", "250"]
+    },
+    {
+      "id": "train_dagger",
+      "label": "训练 DAgger 纠偏",
+      "description": "1 轮、16 episodes、120 epochs",
+      "mode": "new_console",
+      "command": ["{python}", "{root}\\learning\\dagger.py", "--rounds", "1", "--episodes", "16", "--epochs", "120"]
+    },
+    {
+      "id": "ros2_build",
+      "label": "构建 ROS2 工作空间",
+      "description": "在 WSL2 中同步并 colcon build",
+      "mode": "new_console",
+      "command": ["C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "{root}\\ros2_ws\\sync_build.ps1"]
+    },
+    {
+      "id": "simulink",
+      "label": "Simulink CTC 对比",
+      "description": "运行 MATLAB run_scara_ctc_comparison",
+      "mode": "new_console",
+      "command": ["C:\\Program Files\\MATLAB\\R2024a\\bin\\matlab.exe", "-sd", "{root}\\matlab", "-batch", "run_scara_ctc_comparison"]
+    },
+    {
+      "id": "open_full_manual",
+      "label": "打开 SCARA 全栈手册",
+      "description": "PDF 资料",
+      "mode": "open_file",
+      "target": "{root}\\manual\\SCARA全栈开发资料手册.pdf"
+    },
+    {
+      "id": "open_ros2_manual",
+      "label": "打开 ROS2 + SCARA 手册",
+      "description": "PDF 资料",
+      "mode": "open_file",
+      "target": "{root}\\manual\\ROS2_SCARA开发资料手册.pdf"
+    }
+  ]
+}

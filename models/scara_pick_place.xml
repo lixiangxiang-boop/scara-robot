@@ -1,0 +1,98 @@
+<mujoco model="scara-teach-4RPRR">
+  <compiler angle="radian" autolimits="true"/>
+  <option timestep="0.0001" integrator="RK4" gravity="0 0 -9.81"/>
+  <visual>
+    <headlight ambient="0.35 0.35 0.40" diffuse="0.30 0.30 0.35" specular="0.15 0.15 0.15"/>
+    <quality shadowsize="4096" offsamples="4"/>
+    <map stiffness="0.02" znear="0.02"/>
+    <global azimuth="140" elevation="-18" offwidth="1920" offheight="1080"/>
+  </visual>
+  <default>
+    <geom contype="0" conaffinity="0" density="0" group="1"/>
+  </default>
+  <asset>
+    <texture name="skybox" type="skybox" builtin="gradient" rgb1="0.42 0.55 0.78" rgb2="0.95 0.96 1.0" width="256" height="256"/>
+    <texture name="floor_tex" type="2d" builtin="checker" rgb1="0.86 0.87 0.89" rgb2="0.78 0.80 0.84" width="300" height="300"/>
+    <texture name="table_tex" type="2d" builtin="checker" rgb1="0.80 0.72 0.60" rgb2="0.74 0.66 0.54" width="300" height="300"/>
+    <material name="floor_mat" texture="floor_tex" texrepeat="10 10" reflectance="0.05"/>
+    <material name="table_mat" texture="table_tex" texrepeat="3 3" reflectance="0.08"/>
+    <material name="metal_mat" rgba="0.78 0.80 0.84 1" specular="0.8" shininess="0.6" reflectance="0.15"/>
+    <material name="silver_mat" rgba="0.82 0.85 0.90 1" specular="0.9" shininess="0.7"/>
+    <material name="dark_mat" rgba="0.22 0.24 0.28 1" specular="0.5" shininess="0.5"/>
+    <material name="zone_mat" rgba="0.15 0.95 0.35 0.75" reflectance="0.05"/>
+    <material name="object_mat" rgba="1.0 0.42 0.18 1" specular="0.4" shininess="0.4"/>
+  </asset>
+  <worldbody>
+    <body name="base" pos="0 0 0" quat="1 0 0 0">
+      <geom type="cylinder" size="0.09 0.04" pos="0 0 -0.04" rgba="0.25 0.25 0.3 1"/>
+      <geom name="base_plate" type="box" size="0.11 0.11 0.01" pos="0 0 0.01" material="metal_mat" contype="1" conaffinity="1"/>
+      <geom name="base_column" type="cylinder" size="0.055 0.11" pos="0 0 0.13" material="metal_mat" contype="1" conaffinity="1"/>
+      <geom name="base_flange" type="cylinder" size="0.075 0.012" pos="0 0 0.212" material="dark_mat" contype="1" conaffinity="1"/>
+      <geom name="base_shaft" type="cylinder" size="0.020 0.0275" pos="0 0 0.2515" material="dark_mat" contype="1" conaffinity="1"/>
+      <body name="link1" pos="0 0 0.3" quat="1 0 0 0">
+        <joint name="q1" type="hinge" axis="0 0 1" pos="0 0 0" range="-2.26892802759 2.26892802759" limited="true" damping="0.5" frictionloss="0.3"/>
+        <inertial pos="0.11 0 0" mass="3" fullinertia="1e-06 0.01265625 0.01265625 0 0 0"/>
+        <geom type="capsule" size="0.02" fromto="0 0 0 0.225 0 0" rgba="0.25 0.6 1 0.95"/>
+        <body name="link2" pos="0.225 0 0" quat="1 0 0 0">
+          <joint name="q2" type="hinge" axis="0 0 1" pos="0 0 0" range="-2.53072741539 2.53072741539" limited="true" damping="0.4" frictionloss="0.25"/>
+          <inertial pos="0.105 0 0" mass="1.5" fullinertia="1e-06 0.006328125 0.006328125 0 0 0"/>
+          <geom type="capsule" size="0.018" fromto="0 0 0 0.225 0 0" rgba="0.3 0.9 0.45 0.95"/>
+          <geom name="z_housing" type="capsule" fromto="0.225 0 0 0.225 0 -0.12" size="0.030" contype="0" conaffinity="0" material="silver_mat"/>
+          <body name="link3" pos="0.225 0 0" quat="1 0 0 0">
+            <joint name="q3" type="slide" axis="0 0 -1" pos="0 0 0" range="0 0.2" limited="true" damping="20" frictionloss="10"/>
+            <inertial pos="0 0 0" mass="3" fullinertia="1e-12 1e-12 1e-12 0 0 0"/>
+            <geom type="capsule" size="0.024" fromto="0 0 0 0 0 0.06" rgba="1 0.62 0.15 0.95"/>
+            <body name="link4" pos="0 0 0" quat="1 0 0 0">
+              <joint name="q4" type="hinge" axis="0 0 1" pos="0 0 0" range="-6.28318530718 6.28318530718" limited="true" damping="0.02" frictionloss="0.01"/>
+              <inertial pos="0 0 0" mass="1e-12" fullinertia="0.002 0.002 0.002 0 0 0"/>
+              <geom type="cylinder" size="0.03 0.02" rgba="0.98 0.3 0.3 0.95"/>
+              <geom name="palm" type="box" size="0.035 0.028 0.010" pos="0 0 -0.010" contype="0" conaffinity="0" material="dark_mat"/>
+              <geom name="bracket_riser" type="box" size="0.008 0.010 0.035" pos="0.045 0 0.045" contype="0" conaffinity="0" material="dark_mat"/>
+              <geom name="bracket_arm" type="box" size="0.065 0.010 0.008" pos="0.115 0 0.088" contype="0" conaffinity="0" material="dark_mat"/>
+              <geom name="cam_body" type="box" size="0.014 0.016 0.014" pos="0.165 0 0.078" contype="0" conaffinity="0" material="metal_mat"/>
+              <camera name="cam_eye" pos="0.165 0 0.070" xyaxes="0 1 0 -0.588 0 0.808" fovy="55"/>
+              <camera name="cam_wrist" pos="0.05 0 0.03" mode="fixed" fovy="58"/>
+              <body name="finger_l" pos="-0.0180 0 -0.02">
+                <joint name="grip_l" type="slide" axis="-1 0 0" range="0 0.012" damping="2"/>
+                <geom name="finger_pad_l" type="box" size="0.004 0.015 0.020" pos="0 0 -0.040" mass="0.03" contype="1" conaffinity="1" friction="1.6 0.05 0.001" solref="0.008 1" rgba="0.25 0.28 0.32 1"/>
+              </body>
+              <body name="finger_r" pos="0.0180 0 -0.02">
+                <joint name="grip_r" type="slide" axis="1 0 0" range="0 0.012" damping="2"/>
+                <geom name="finger_pad_r" type="box" size="0.004 0.015 0.020" pos="0 0 -0.040" mass="0.03" contype="1" conaffinity="1" friction="1.6 0.05 0.001" solref="0.008 1" rgba="0.25 0.28 0.32 1"/>
+              </body>
+                <site name="ee" pos="0 0 0" size="0.005" rgba="0 0.8 0 1"/>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+    <camera name="cam_front" pos="0.26 -0.95 0.55" xyaxes="1 0 0 0 0.428 0.904" fovy="42"/>
+    <camera name="cam_top" pos="0.4 0.0 1.25" xyaxes="1 0 0 0 1 0" fovy="38"/>
+    <geom name="floor" type="plane" size="4 4 0.05" pos="0 0 0" material="floor_mat" contype="0" conaffinity="0"/>
+    <light name="key" pos="0.55 0.35 1.15" dir="-0.35 -0.22 -1" directional="false" diffuse="0.95 0.95 0.95" specular="0.35 0.35 0.35" castshadow="true"/>
+    <light name="fill" pos="-0.35 -0.45 0.75" dir="0.35 0.45 -0.8" directional="false" diffuse="0.45 0.5 0.6" specular="0.1 0.1 0.12" castshadow="false"/>
+    <geom name="table_top" type="box" size="0.26 0.26 0.01" pos="0.4 0.0 0.09000000000000001" material="table_mat" contype="1" conaffinity="1" friction="0.7 0.05 0.001"/>
+    <geom name="leg_11" type="box" size="0.018 0.018 0.04" pos="0.63 0.23 0.04" material="metal_mat" contype="1" conaffinity="1"/>
+    <geom name="leg_1-1" type="box" size="0.018 0.018 0.04" pos="0.63 -0.23 0.04" material="metal_mat" contype="1" conaffinity="1"/>
+    <geom name="leg_-11" type="box" size="0.018 0.018 0.04" pos="0.17 0.23 0.04" material="metal_mat" contype="1" conaffinity="1"/>
+    <geom name="leg_-1-1" type="box" size="0.018 0.018 0.04" pos="0.17 -0.23 0.04" material="metal_mat" contype="1" conaffinity="1"/>
+    <geom name="place_zone" type="box" size="0.05 0.05 0.001" pos="0.3 0.12 0.101" contype="0" conaffinity="0" material="zone_mat"/>
+    <body name="object" pos="0.3 -0.05 0.115">
+      <freejoint name="object_free"/>
+      <geom name="object_geom" type="box" size="0.015 0.015 0.015" mass="0.05" contype="1" conaffinity="1" friction="1.0 0.05 0.001" solref="0.01 1" material="object_mat"/>
+    </body>
+  </worldbody>
+  <actuator>
+    <motor name="tau_q1" joint="q1" gear="1"/>
+    <motor name="tau_q2" joint="q2" gear="1"/>
+    <motor name="tau_q3" joint="q3" gear="1"/>
+    <motor name="tau_q4" joint="q4" gear="1"/>
+    <position name="grip_l_motor" joint="grip_l" kp="900" kv="6" ctrlrange="0 0.012"/>
+    <position name="grip_r_motor" joint="grip_r" kp="900" kv="6" ctrlrange="0 0.012"/>
+  </actuator>
+  <equality>
+    <!-- 吸附辅助（默认关闭）：需要时由 grasp_assist() 打开 -->
+    <weld name="grasp_assist" body1="object" body2="link4" active="false"
+          anchor="0 0 0" relpose="0 0 0 1 0 0 0"/>
+  </equality>
+</mujoco>

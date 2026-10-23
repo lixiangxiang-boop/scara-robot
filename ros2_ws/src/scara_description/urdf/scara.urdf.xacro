@@ -1,0 +1,333 @@
+<?xml version="1.0"?>
+<!--
+  SCARA-teach-4RPRR 的 URDF/xacro
+  ==================================================================
+  数字全部来自 params.generated.xacro（由 ros2_ws/tools/gen_ros_assets.py
+  从 python/armlab/spec.py 与 scara_scene.py（MuJoCo 场景）生成）。
+  本文件只保留几何摆放与 ros2_control 接口结构，避免"手抄参数漂移"。
+
+  构型 RRPR：J1/J2 回转、J3 移动（轴 -z，q3 增大则末端下降）、J4 末端回转。
+  夹爪：两指各一个移动副，闭合时内表面 ±14 mm（28 mm 间距，对 30 mm 物块 2 mm 过盈）。
+  相机：cam_eye（J4 外侧支架，第一人称）、cam_wrist（腕部近景）随 link4 运动；
+        cam_top / cam_front 固定在世界，由生成的 SDF 世界提供。
+-->
+<robot name="scara" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:include filename="params.generated.xacro"/>
+
+  <!-- 仅在 URDF 里用到的几何量（不参与动力学计算） -->
+  <xacro:property name="r1" value="0.020"/>
+  <xacro:property name="r2" value="0.018"/>
+  <xacro:property name="r3" value="0.024"/>
+  <xacro:property name="pad_x" value="0.004"/>
+  <xacro:property name="pad_y" value="0.015"/>
+  <xacro:property name="pad_z" value="0.020"/>
+  <!-- 指尖相对工具原点向下 20~60 mm（与 scara_scene.FINGER_SPAN_Z 一致） -->
+  <xacro:property name="finger_gap" value="${grip_gap_closed / 2 + pad_x}"/>
+  <xacro:property name="m_finger" value="0.03"/>
+
+  <material name="Gazebo/SkyBlue"><color rgba="0.20 0.55 0.95 1"/></material>
+  <material name="Gazebo/Green"><color rgba="0.25 0.80 0.40 1"/></material>
+  <material name="Gazebo/Orange"><color rgba="1.0 0.62 0.15 1"/></material>
+  <material name="Gazebo/Grey"><color rgba="0.45 0.48 0.52 1"/></material>
+  <material name="Gazebo/DarkGrey"><color rgba="0.22 0.24 0.27 1"/></material>
+  <material name="Gazebo/Red"><color rgba="0.85 0.25 0.25 1"/></material>
+
+  <!-- ============ 世界锚点 ============ -->
+  <link name="world"/>
+  <joint name="world_fixed" type="fixed">
+    <parent link="world"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ============ 底座（结构件） ============ -->
+  <link name="base_link">
+    <inertial>
+      <mass value="15.0"/>
+      <origin xyz="0 0 0.10" rpy="0 0 0"/>
+      <inertia ixx="0.150" ixy="0" ixz="0" iyy="0.150" iyz="0" izz="0.120"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0.01" rpy="0 0 0"/>
+      <geometry><box size="0.24 0.24 0.02"/></geometry>
+      <material name="Gazebo/DarkGrey"><color rgba="0.22 0.24 0.27 1"/></material>
+    </visual>
+    <visual>
+      <origin xyz="0 0 0.16" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.075" length="0.30"/></geometry>
+      <material name="Gazebo/Grey"><color rgba="0.45 0.48 0.52 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.15" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.09" length="0.30"/></geometry>
+    </collision>
+    <gazebo reference="base_link"><material>Gazebo/DarkGrey</material></gazebo>
+  </link>
+
+  <!-- ============ J1 ============ -->
+  <link name="link1">
+    <inertial>
+      <origin xyz="${com1} 0 0" rpy="0 0 0"/>
+      <mass value="${m1}"/>
+      <inertia ixx="${I1x}" ixy="0" ixz="0" iyy="${I1yz}" iyz="0" izz="${I1yz}"/>
+    </inertial>
+    <visual>
+      <origin xyz="${a1/2} 0 0" rpy="0 0 0"/>
+      <geometry><box size="${a1} 0.040 0.040"/></geometry>
+      <material name="Gazebo/SkyBlue"><color rgba="0.20 0.55 0.95 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="${a1/2} 0 0" rpy="0 0 0"/>
+      <geometry><box size="${a1} 0.040 0.040"/></geometry>
+    </collision>
+    <gazebo reference="link1"><material>Gazebo/SkyBlue</material></gazebo>
+  </link>
+  <joint name="joint1" type="revolute">
+    <parent link="base_link"/>
+    <child link="link1"/>
+    <origin xyz="0 0 ${d1}" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-2.268928" upper="2.268928" effort="40" velocity="3.14"/>
+    <dynamics damping="0.5" friction="0.3"/>
+  </joint>
+
+  <!-- ============ J2 ============ -->
+  <link name="link2">
+    <inertial>
+      <origin xyz="${com2} 0 0" rpy="0 0 0"/>
+      <mass value="${m2}"/>
+      <inertia ixx="${I2x}" ixy="0" ixz="0" iyy="${I2yz}" iyz="0" izz="${I2yz}"/>
+    </inertial>
+    <visual>
+      <origin xyz="${a2/2} 0 0" rpy="0 0 0"/>
+      <geometry><box size="${a2} 0.036 0.036"/></geometry>
+      <material name="Gazebo/Green"><color rgba="0.25 0.80 0.40 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="${a2/2} 0 0" rpy="0 0 0"/>
+      <geometry><box size="${a2} 0.036 0.036"/></geometry>
+    </collision>
+    <gazebo reference="link2"><material>Gazebo/Green</material></gazebo>
+  </link>
+  <joint name="joint2" type="revolute">
+    <parent link="link1"/>
+    <child link="link2"/>
+    <origin xyz="${a1} 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-2.530727" upper="2.530727" effort="40" velocity="3.14"/>
+    <dynamics damping="0.4" friction="0.25"/>
+  </joint>
+
+  <!-- ============ J3（移动副，轴 -z） ============ -->
+  <link name="link3">
+    <inertial>
+      <origin xyz="0 0 -0.030" rpy="0 0 0"/>
+      <mass value="${m3}"/>
+      <inertia ixx="0.001332" ixy="0" ixz="0" iyy="0.001332" iyz="0" izz="0.000864"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0.010" rpy="0 0 0"/>
+      <geometry><cylinder radius="${r3}" length="0.080"/></geometry>
+      <material name="Gazebo/Orange"><color rgba="1.0 0.62 0.15 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.010" rpy="0 0 0"/>
+      <geometry><cylinder radius="${r3}" length="0.080"/></geometry>
+    </collision>
+    <gazebo reference="link3"><material>Gazebo/Orange</material></gazebo>
+  </link>
+  <joint name="joint3" type="prismatic">
+    <parent link="link2"/>
+    <child link="link3"/>
+    <origin xyz="${a2} 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 -1"/>
+    <limit lower="0" upper="${stroke}" effort="80" velocity="0.5"/>
+    <dynamics damping="20.0" friction="10.0"/>
+  </joint>
+
+  <!-- ============ J4（法兰 + 夹爪 + 两个随动相机） ============ -->
+  <link name="link4">
+    <inertial>
+      <origin xyz="0 0 -0.020" rpy="0 0 0"/>
+      <mass value="${m4}"/>
+      <inertia ixx="0.000108" ixy="0" ixz="0" iyy="0.000108" iyz="0" izz="0.000135"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 -0.010" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.030" length="0.020"/></geometry>
+      <material name="Gazebo/Red"><color rgba="0.85 0.25 0.25 1"/></material>
+    </visual>
+    <visual>
+      <origin xyz="0 0 -0.030" rpy="0 0 0"/>
+      <geometry><box size="0.060 0.030 0.020"/></geometry>
+      <material name="Gazebo/DarkGrey"><color rgba="0.22 0.24 0.27 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.020" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.030" length="0.040"/></geometry>
+    </collision>
+    <gazebo reference="link4"><material>Gazebo/Red</material></gazebo>
+  </link>
+  <joint name="joint4" type="revolute">
+    <parent link="link3"/>
+    <child link="link4"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-6.283185" upper="6.283185" effort="5" velocity="6.28"/>
+    <dynamics damping="0.02" friction="0.01"/>
+  </joint>
+
+  <!-- ============ 两指夹爪 ============ -->
+  <xacro:macro name="finger" params="name side">
+    <link name="${name}">
+      <inertial>
+        <origin xyz="0 0 -0.040" rpy="0 0 0"/>
+        <mass value="${m_finger}"/>
+        <inertia ixx="0.0000102" ixy="0" ixz="0" iyy="0.0000049" iyz="0" izz="0.0000059"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 -0.040" rpy="0 0 0"/>
+        <geometry><box size="${2*pad_x} ${2*pad_y} ${2*pad_z}"/></geometry>
+        <material name="Gazebo/Grey"><color rgba="0.45 0.48 0.52 1"/></material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 -0.040" rpy="0 0 0"/>
+        <geometry><box size="${2*pad_x} ${2*pad_y} ${2*pad_z}"/></geometry>
+      </collision>
+      <gazebo reference="${name}">
+        <material>Gazebo/Grey</material>
+        <mu1>1.2</mu1><mu2>1.2</mu2>
+      </gazebo>
+    </link>
+    <joint name="${name}_joint" type="prismatic">
+      <parent link="link4"/>
+      <child link="${name}"/>
+      <origin xyz="${side * finger_gap} 0 0" rpy="0 0 0"/>
+      <axis xyz="${side} 0 0"/>
+      <limit lower="0" upper="${grip_open}" effort="40" velocity="0.1"/>
+      <dynamics damping="2.0"/>
+    </joint>
+  </xacro:macro>
+  <xacro:finger name="gripper_left" side="-1"/>
+  <xacro:finger name="gripper_right" side="1"/>
+
+  <!-- ============ 随动相机（参数与 MuJoCo 场景一致） ============ -->
+  <link name="cam_eye_link"/>
+  <joint name="cam_eye_joint" type="fixed">
+    <parent link="link4"/>
+    <child link="cam_eye_link"/>
+    <origin xyz="${cam_eye_x} ${cam_eye_y} ${cam_eye_z}"
+            rpy="${cam_eye_roll} ${cam_eye_pitch} ${cam_eye_yaw}"/>
+  </joint>
+  <link name="cam_eye_optical"/>
+  <joint name="cam_eye_optical_joint" type="fixed">
+    <parent link="cam_eye_link"/>
+    <child link="cam_eye_optical"/>
+    <origin xyz="0 0 0" rpy="-1.5708 0 -1.5708"/>
+  </joint>
+  <gazebo reference="cam_eye_link">
+    <sensor name="cam_eye" type="camera">
+      <pose>0 0 0 0 0 0</pose>
+      <camera>
+        <horizontal_fov>${cam_eye_fovx}</horizontal_fov>
+        <image><width>${img_w}</width><height>${img_h}</height></image>
+        <clip><near>0.02</near><far>8.0</far></clip>
+      </camera>
+      <always_on>1</always_on>
+      <update_rate>10</update_rate>
+      <visualize>false</visualize>
+      <plugin filename="libgazebo_ros_camera.so" name="cam_eye_driver">
+        <ros>
+          <image_topic_name>image_raw</image_topic_name>
+          <camera_info_topic_name>camera_info</camera_info_topic_name>
+        </ros>
+        <frame_name>cam_eye_optical</frame_name>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <link name="cam_wrist_link"/>
+  <joint name="cam_wrist_joint" type="fixed">
+    <parent link="link4"/>
+    <child link="cam_wrist_link"/>
+    <origin xyz="${cam_wrist_x} ${cam_wrist_y} ${cam_wrist_z}"
+            rpy="${cam_wrist_roll} ${cam_wrist_pitch} ${cam_wrist_yaw}"/>
+  </joint>
+  <link name="cam_wrist_optical"/>
+  <joint name="cam_wrist_optical_joint" type="fixed">
+    <parent link="cam_wrist_link"/>
+    <child link="cam_wrist_optical"/>
+    <origin xyz="0 0 0" rpy="-1.5708 0 -1.5708"/>
+  </joint>
+  <gazebo reference="cam_wrist_link">
+    <sensor name="cam_wrist" type="camera">
+      <pose>0 0 0 0 0 0</pose>
+      <camera>
+        <horizontal_fov>${cam_wrist_fovx}</horizontal_fov>
+        <image><width>${img_w}</width><height>${img_h}</height></image>
+        <clip><near>0.02</near><far>8.0</far></clip>
+      </camera>
+      <always_on>1</always_on>
+      <update_rate>10</update_rate>
+      <visualize>false</visualize>
+      <plugin filename="libgazebo_ros_camera.so" name="cam_wrist_driver">
+        <ros>
+          <image_topic_name>image_raw</image_topic_name>
+          <camera_info_topic_name>camera_info</camera_info_topic_name>
+        </ros>
+        <frame_name>cam_wrist_optical</frame_name>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <!-- ============ ros2_control 接口 ============ -->
+  <ros2_control name="GazeboSystem" type="system">
+    <hardware>
+      <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+    </hardware>
+    <joint name="joint1">
+      <command_interface name="position"/>
+      <state_interface name="position"><param name="initial_value">0.0</param></state_interface>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="joint2">
+      <command_interface name="position"/>
+      <state_interface name="position"><param name="initial_value">-0.5</param></state_interface>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="joint3">
+      <command_interface name="position"/>
+      <state_interface name="position"><param name="initial_value">0.04</param></state_interface>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="joint4">
+      <command_interface name="position"/>
+      <state_interface name="position"><param name="initial_value">0.0</param></state_interface>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="gripper_left_joint">
+      <!-- 只声明状态接口：手指由 gazebo_ros_force_system 的 /apply_joint_effort 做力控
+           （gazebo_ros2_control 的 position/velocity 命令在 Gazebo Classic 里是运动学置位，
+            不会产生夹持力） -->
+      <state_interface name="position"><param name="initial_value">0.012</param></state_interface>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="gripper_right_joint">
+      <!-- 只声明状态接口：手指由 gazebo_ros_force_system 的 /apply_joint_effort 做力控
+           （gazebo_ros2_control 的 position/velocity 命令在 Gazebo Classic 里是运动学置位，
+            不会产生夹持力） -->
+      <state_interface name="position"><param name="initial_value">0.012</param></state_interface>
+      <state_interface name="velocity"/>
+    </joint>
+  </ros2_control>
+
+  <gazebo>
+    <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
+      <parameters>$(find scara_bringup)/config/controllers.yaml</parameters>
+      <robot_param>robot_description</robot_param>
+      <robot_param_node>robot_state_publisher</robot_param_node>
+    </plugin>
+  </gazebo>
+
+</robot>
